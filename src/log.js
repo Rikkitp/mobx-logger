@@ -50,7 +50,7 @@ const logAction = (ev) => {
         return;
     }
 
-    console.groupCollapsed('%c%s  %s  %s.%s()', style('#000'), now(), padStart('ACTION', 8), ev.object.name || ev.object, ev.name);
+    groupCollapsed('%c%s  %s  %s.%s()', style('#000'), now(), padStart('ACTION', 8), ev.object.name || ev.object, ev.name);
     console.log('%cFunction %o', style('#777'), ev.fn);
     console.log('%cArguments %o', style('#777'), ev.arguments);
     console.log('%cTarget %o', style('#777'), ev.object);
@@ -60,7 +60,7 @@ const logAction = (ev) => {
 
 const logReaction = (ev) => {
     const name = ev.object.name.replace('#null', '');
-    console.groupCollapsed('%c%s  %s  %s', style('#9E9E9E'), now(), padStart('REACTION', 8), name);
+    groupCollapsed('%c%s  %s  %s', style('#9E9E9E'), now(), padStart('REACTION', 8), name);
 
     const observables = ev.object.observing || [];
     const names = observables.map(it => it.name);
@@ -73,7 +73,7 @@ const logReaction = (ev) => {
 };
 
 const logTransaction = (ev) => {
-    console.groupCollapsed('%c%s  %s  %s', style('#7B7B7B'), now(), padStart('TX', 8), ev.name);
+    groupCollapsed('%c%s  %s  %s', style('#7B7B7B'), now(), padStart('TX', 8), ev.name);
     console.log('%cEvent %o', style('#777'), ev);
     console.groupEnd();
 };
@@ -87,7 +87,7 @@ const logCompute = (ev) => {
     if (propName) {
         propName = `.${propName}`;
     }
-    console.groupCollapsed('%c%s  %s  %s%s', style('#9E9E9E'), now(), padStart('COMPUTE', 8), name, propName);
+    groupCollapsed('%c%s  %s  %s%s', style('#9E9E9E'), now(), padStart('COMPUTE', 8), name, propName);
     console.log('%cEvent %o', style('#777'), ev);
     console.groupEnd();
 };
@@ -102,6 +102,21 @@ const getPropName = (ev) => {
                 key => ev.object.$mobx.values[key].derivation === ev.fn
             )[0] || '';
 };
+
+function groupCollapsed() {
+  const isIE = window.navigator.userAgent.indexOf('MSIE ') >= 0;
+
+  if (!isIE) {
+    console.groupCollapsed.apply(console, arguments);
+    return;
+  }
+
+  if (arguments.length > 1) {
+    console.groupCollapsed(arguments);
+  } else {
+    console.groupCollapsed(arguments[0]);
+  }
+}
 
 export default (ev, options) => {
     if (options[ev.type] !== true) {
